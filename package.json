@@ -9,15 +9,50 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:notesView",
+    "onView:todoPanel"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "paper-vscode.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "paper.newNote",
+        "title": "New Note"
+      },
+      {
+        "command": "paper.openNote",
+        "title": "Open Note"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "paperViewContainer",
+          "title": "Paper",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "paperViewContainer": [
+        {
+          "id": "notesView",
+          "name": "Notes"
+        }
+      ],
+      "workbench.view.extension.paperViewContainer": [
+        {
+          "id": "todoPanel",
+          "name": "Todo",
+          "type": "webview"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
