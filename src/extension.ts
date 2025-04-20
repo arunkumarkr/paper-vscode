@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { NotesTreeDataProvider } from "./notesTreeData";
+import { TodoPanelProvider } from "./todoPanel";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -44,7 +45,19 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(disposable, openNoteCommand, newNoteCommand);
+  const todoProvider = new TodoPanelProvider(context);
+
+  const todoView = vscode.window.registerWebviewViewProvider(
+    "todoPanel",
+    todoProvider
+  );
+
+  context.subscriptions.push(
+    disposable,
+    openNoteCommand,
+    newNoteCommand,
+    todoView
+  );
 }
 
 // This method is called when your extension is deactivated

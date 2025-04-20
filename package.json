@@ -43,9 +43,7 @@
         {
           "id": "notesView",
           "name": "Notes"
-        }
-      ],
-      "workbench.view.extension.paperViewContainer": [
+        },
         {
           "id": "todoPanel",
           "name": "Todo",
