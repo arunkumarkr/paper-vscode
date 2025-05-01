@@ -54,25 +54,64 @@ export class TodoPanelProvider implements vscode.WebviewViewProvider {
     const items = todos
       .map(
         (t, i) => `
-        <li>
-          <input type="checkbox" ${t.done ? "checked" : ""} data-index="${i}" />
-          <span style="text-decoration: ${t.done ? "line-through" : "none"};">${
-          t.text
-        }</span>
-        </li>
-      `
+          <li style="margin: 4px 0; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" ${
+              t.done ? "checked" : ""
+            } data-index="${i}" />
+            <span style="text-decoration: ${
+              t.done ? "line-through" : "none"
+            }; color: var(--vscode-foreground);">
+              ${t.text}
+            </span>
+          </li>
+        `
       )
       .join("");
 
     return `
       <html>
-        <body style="padding: 10px;">
+        <head>
+          <style>
+            body {
+              padding: 8px;
+              background-color: var(--vscode-sideBar-background);
+              color: var(--vscode-foreground);
+              font-family: var(--vscode-font-family);
+              font-size: var(--vscode-font-size);
+            }
+            input[type="text"] {
+              padding: 4px 8px;
+              background-color: var(--vscode-input-background);
+              color: var(--vscode-input-foreground);
+              border: 1px solid var(--vscode-input-border);
+              border-radius: 2px;
+              outline: none;
+            }
+            button {
+              margin-top: 8px;
+              background-color: var(--vscode-button-background);
+              color: var(--vscode-button-foreground);
+              border: none;
+              padding: 5px 10px;
+              border-radius: 2px;
+              cursor: pointer;
+            }
+            button:hover {
+              background-color: var(--vscode-button-hoverBackground);
+            }
+            #todo-form{
+              display: flex;
+              flex-direction:column
+            }
+          </style>
+        </head>
+        <body>
           <form id="todo-form">
-            <input type="text" id="new-todo" placeholder="Add a task" style="width: 80%;" />
+            <input type="text" id="new-todo" placeholder="Add a task" />
             <button type="submit">Add</button>
           </form>
-          <ul id="todo-list">${items}</ul>
-
+          <ul style="list-style: none; padding-left: 0;">${items}</ul>
+  
           <script>
             const vscode = acquireVsCodeApi();
             document.getElementById('todo-form').addEventListener('submit', e => {
@@ -83,7 +122,7 @@ export class TodoPanelProvider implements vscode.WebviewViewProvider {
                 input.value = '';
               }
             });
-
+  
             document.querySelectorAll('input[type="checkbox"]').forEach(box => {
               box.addEventListener('change', () => {
                 const index = parseInt(box.dataset.index);
