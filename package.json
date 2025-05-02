@@ -34,6 +34,11 @@
         "command": "paper.deleteNote",
         "title": "Delete",
         "icon": "$(trash)"
+      },
+      {
+        "command": "paper.newNote",
+        "title": "New Note",
+        "icon": "$(new-file)"
       }
     ],
     "viewsContainers": {
@@ -64,6 +69,13 @@
           "command": "paper.deleteNote",
           "when": "view == notesView && viewItem == noteItem",
           "group": "inline"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "paper.newNote",
+          "when": "view == notesView",
+          "group": "navigation"
         }
       ]
     }
