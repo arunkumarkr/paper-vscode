@@ -1,6 +1,7 @@
 {
   "name": "paper-vscode",
   "displayName": "paper-vscode",
+  "publisher": "paper-vscode",
   "description": "A notes + todo assitant for VSCode",
   "version": "0.0.1",
   "engines": {
@@ -11,7 +12,8 @@
   ],
   "activationEvents": [
     "onView:notesView",
-    "onView:todoPanel"
+    "onView:todoPanel",
+    "onCommand:paper.deleteNote"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -27,6 +29,11 @@
       {
         "command": "paper.openNote",
         "title": "Open Note"
+      },
+      {
+        "command": "paper.deleteNote",
+        "title": "Delete",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -34,7 +41,7 @@
         {
           "id": "paperViewContainer",
           "title": "Paper",
-          "icon": "media/icon.svg"
+          "icon": "$(pinned)"
         }
       ]
     },
@@ -48,6 +55,15 @@
           "id": "todoPanel",
           "name": "Todo",
           "type": "webview"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "paper.deleteNote",
+          "when": "view == notesView && viewItem == noteItem",
+          "group": "inline"
         }
       ]
     }

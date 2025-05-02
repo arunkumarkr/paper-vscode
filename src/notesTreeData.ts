@@ -33,7 +33,7 @@ export class NotesTreeDataProvider
       .filter((file) => file.endsWith(".txt"));
     const items = files.map((file) => {
       const filePath = path.join(this.notesDir, file);
-      return new NoteItem(file, vscode.Uri.file(filePath));
+      return new NoteItem(vscode.Uri.file(filePath));
     });
     return Promise.resolve(items);
   }
@@ -51,16 +51,14 @@ export class NotesTreeDataProvider
 }
 
 class NoteItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly resourceUri: vscode.Uri
-  ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
+  constructor(public readonly resourceUri: vscode.Uri) {
+    super(resourceUri, vscode.TreeItemCollapsibleState.None);
     this.command = {
       command: "paper.openNote",
       title: "Open Note",
       arguments: [this.resourceUri],
     };
+
     this.contextValue = "noteItem";
   }
 }

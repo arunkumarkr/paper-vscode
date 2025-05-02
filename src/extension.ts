@@ -3,6 +3,7 @@
 import * as vscode from "vscode";
 import { NotesTreeDataProvider } from "./notesTreeData";
 import { TodoPanelProvider } from "./todoPanel";
+import * as fs from "fs";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -45,6 +46,35 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const deleteNoteCommand = vscode.commands.registerCommand(
+    "paper.deleteNote",
+    (item: vscode.TreeItem) => {
+      const uri = item.resourceUri;
+      if (!uri || !uri.fsPath) {
+        vscode.window.showErrorMessage("No note selected.");
+        return;
+      }
+      const fileName = uri.fsPath.split("/").pop();
+
+      vscode.window
+        .showWarningMessage(`Delete "${fileName}"?`, { modal: true }, "Delete")
+        .then((answer) => {
+          if (answer === "Delete") {
+            fs.unlink(uri.fsPath, (err) => {
+              if (err) {
+                vscode.window.showErrorMessage(
+                  `Failed to delete note: ${err.message}`
+                );
+              } else {
+                vscode.window.showInformationMessage("Note deleted.");
+                notesProvider.refresh();
+              }
+            });
+          }
+        });
+    }
+  );
+
   const todoProvider = new TodoPanelProvider(context);
 
   const todoView = vscode.window.registerWebviewViewProvider(
@@ -56,7 +86,8 @@ export function activate(context: vscode.ExtensionContext) {
     disposable,
     openNoteCommand,
     newNoteCommand,
-    todoView
+    todoView,
+    deleteNoteCommand
   );
 }
 
