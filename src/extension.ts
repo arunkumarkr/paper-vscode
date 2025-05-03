@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { NotesTreeDataProvider } from "./notesTreeData";
 import { TodoPanelProvider } from "./todoPanel";
 import * as fs from "fs";
+import * as path from "path";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -72,6 +73,50 @@ export function activate(context: vscode.ExtensionContext) {
             });
           }
         });
+    }
+  );
+
+  const renameNoteCommand = vscode.commands.registerCommand(
+    "paper.renameNote",
+    async (item: vscode.TreeItem) => {
+      const uri = (item as any).resourceUri ?? item;
+
+      if (!uri || !uri.fsPath) {
+        vscode.window.showErrorMessage("No note selected.");
+        return;
+      }
+
+      const oldPath = uri.fsPath;
+      const oldName = path.basename(oldPath);
+
+      const newName = await vscode.window.showInputBox({
+        prompt: `Rename ${oldName} to...`,
+        value: oldName,
+        validateInput: (input) => {
+          if (!input.trim()) {
+            return "File name cannot be empty";
+          }
+          if (input.includes("/") || input.includes("\\")) {
+            return "File name cannot contain slashes";
+          }
+          return null;
+        },
+      });
+
+      if (!newName || newName === oldName) {
+        return;
+      }
+
+      const newPath = path.join(path.dirname(oldPath), newName);
+
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+          vscode.window.showErrorMessage(`Rename failed: ${err.message}`);
+        } else {
+          vscode.window.showInformationMessage(`Renamed to ${newName}`);
+          notesProvider.refresh();
+        }
+      });
     }
   );
 

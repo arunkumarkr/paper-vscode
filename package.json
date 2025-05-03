@@ -39,6 +39,10 @@
         "command": "paper.newNote",
         "title": "New Note",
         "icon": "$(new-file)"
+      },
+      {
+        "command": "paper.renameNote",
+        "title": "Rename Note"
       }
     ],
     "viewsContainers": {
@@ -67,6 +71,11 @@
       "view/item/context": [
         {
           "command": "paper.deleteNote",
+          "when": "view == notesView && viewItem == noteItem",
+          "group": "inline"
+        },
+        {
+          "command": "paper.renameNote",
           "when": "view == notesView && viewItem == noteItem",
           "group": "inline"
         }

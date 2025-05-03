@@ -28,9 +28,10 @@ export class NotesTreeDataProvider
   }
 
   getChildren(): Thenable<NoteItem[]> {
-    const files = fs
-      .readdirSync(this.notesDir)
-      .filter((file) => file.endsWith(".txt"));
+    const files = fs.readdirSync(this.notesDir).filter((file) => {
+      const fullPath = path.join(this.notesDir, file);
+      return fs.statSync(fullPath).isFile();
+    });
     const items = files.map((file) => {
       const filePath = path.join(this.notesDir, file);
       return new NoteItem(vscode.Uri.file(filePath));
