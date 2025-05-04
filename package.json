@@ -2,7 +2,7 @@
   "name": "paper-vscode",
   "displayName": "paper-vscode",
   "publisher": "paper-vscode",
-  "description": "A notes + todo assitant for VSCode",
+  "description": "A notes + todo assistant for VSCode",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.99.0"
@@ -24,7 +24,8 @@
       },
       {
         "command": "paper.newNote",
-        "title": "New Note"
+        "title": "New Note",
+        "icon": "$(new-file)"
       },
       {
         "command": "paper.openNote",
@@ -34,11 +35,6 @@
         "command": "paper.deleteNote",
         "title": "Delete",
         "icon": "$(trash)"
-      },
-      {
-        "command": "paper.newNote",
-        "title": "New Note",
-        "icon": "$(new-file)"
       },
       {
         "command": "paper.renameNote",
@@ -59,20 +55,28 @@
         {
           "id": "paperViewContainer",
           "title": "Paper",
-          "icon": "$(pinned)"
+          "icon": "media/icon.svg"
         }
       ]
     },
     "views": {
       "paperViewContainer": [
         {
+          "id": "paperStartupView",
+          "name": "Welcome",
+          "type": "webview",
+          "when": "!paper.folderSelected"
+        },
+        {
           "id": "notesView",
-          "name": "Notes"
+          "name": "Notes",
+          "when": "paper.folderSelected"
         },
         {
           "id": "todoPanel",
           "name": "Todo",
-          "type": "webview"
+          "type": "webview",
+          "when": "paper.folderSelected"
         }
       ]
     },
