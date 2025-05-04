@@ -42,7 +42,8 @@
       },
       {
         "command": "paper.renameNote",
-        "title": "Rename Note"
+        "title": "Rename Note",
+        "icon": "$(symbol-key)"
       }
     ],
     "viewsContainers": {
@@ -70,12 +71,12 @@
     "menus": {
       "view/item/context": [
         {
-          "command": "paper.deleteNote",
+          "command": "paper.renameNote",
           "when": "view == notesView && viewItem == noteItem",
           "group": "inline"
         },
         {
-          "command": "paper.renameNote",
+          "command": "paper.deleteNote",
           "when": "view == notesView && viewItem == noteItem",
           "group": "inline"
         }
