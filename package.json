@@ -44,6 +44,14 @@
         "command": "paper.renameNote",
         "title": "Rename Note",
         "icon": "$(symbol-key)"
+      },
+      {
+        "command": "paper.selectNotesDirectory",
+        "title": "Select Notes Folder"
+      },
+      {
+        "command": "paper.resetNotesDirectory",
+        "title": "Reset Notes Folder"
       }
     ],
     "viewsContainers": {
@@ -86,6 +94,16 @@
           "command": "paper.newNote",
           "when": "view == notesView",
           "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "paper.selectNotesDirectory",
+          "when": "true"
+        },
+        {
+          "command": "paper.resetNotesDirectory",
+          "when": "true"
         }
       ]
     }

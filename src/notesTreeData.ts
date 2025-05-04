@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import { INTERNAL_TODO_FILENAME } from "./constants";
 
 export class NotesTreeDataProvider
   implements vscode.TreeDataProvider<NoteItem>
@@ -13,7 +14,12 @@ export class NotesTreeDataProvider
     this._onDidChangeTreeData.event;
 
   constructor(private context: vscode.ExtensionContext) {
-    this.notesDir = path.join(context.globalStorageUri.fsPath, "notes");
+    const notesPath = this.context.workspaceState.get<string>("notesDirectory");
+    if (!notesPath) {
+      throw new Error("Notes directory not set.");
+    }
+    this.notesDir = notesPath;
+
     if (!fs.existsSync(this.notesDir)) {
       fs.mkdirSync(this.notesDir, { recursive: true });
     }
@@ -30,7 +36,7 @@ export class NotesTreeDataProvider
   getChildren(): Thenable<NoteItem[]> {
     const files = fs.readdirSync(this.notesDir).filter((file) => {
       const fullPath = path.join(this.notesDir, file);
-      return fs.statSync(fullPath).isFile();
+      return fs.statSync(fullPath).isFile() && file !== INTERNAL_TODO_FILENAME;
     });
     const items = files.map((file) => {
       const filePath = path.join(this.notesDir, file);

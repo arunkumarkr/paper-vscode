@@ -8,10 +8,23 @@ import * as path from "path";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "paper-vscode" is now active!');
+export async function activate(context: vscode.ExtensionContext) {
+  const folderPath = context.workspaceState.get<string>("notesDirectory");
+  if (!folderPath) {
+    const result = await vscode.window.showOpenDialog({
+      canSelectFolders: true,
+      openLabel: "Select Notes Folder for Paper",
+    });
+
+    if (!result || result.length === 0) {
+      vscode.window.showErrorMessage("Paper requires a folder to store notes.");
+      return;
+    }
+
+    const selectedPath = result[0].fsPath;
+    await context.workspaceState.update("notesDirectory", selectedPath);
+    vscode.window.showInformationMessage("Notes folder set!");
+  }
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
@@ -120,6 +133,45 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const selectNotesDirectoryCommand = vscode.commands.registerCommand(
+    "paper.selectNotesDirectory",
+    async () => {
+      const result = await vscode.window.showOpenDialog({
+        canSelectFolders: true,
+        openLabel: "Select Notes Folder",
+      });
+
+      if (!result || result.length === 0) {
+        return;
+      }
+
+      const selectedPath = result[0].fsPath;
+      await context.workspaceState.update("notesDirectory", selectedPath);
+
+      vscode.window.showInformationMessage("Notes folder set!");
+      notesProvider.refresh();
+    }
+  );
+
+  const resetNotesDirectoryCommand = vscode.commands.registerCommand(
+    "paper.resetNotesDirectory",
+    async () => {
+      const confirmed = await vscode.window.showWarningMessage(
+        "Are you sure you want to reset the notes folder?",
+        { modal: true },
+        "Reset"
+      );
+
+      if (confirmed === "Reset") {
+        await context.workspaceState.update("notesDirectory", undefined);
+        vscode.window.showInformationMessage(
+          "Notes folder has been reset. Please select a new one."
+        );
+        vscode.commands.executeCommand("workbench.action.reloadWindow");
+      }
+    }
+  );
+
   const todoProvider = new TodoPanelProvider(context);
 
   const todoView = vscode.window.registerWebviewViewProvider(
@@ -132,7 +184,10 @@ export function activate(context: vscode.ExtensionContext) {
     openNoteCommand,
     newNoteCommand,
     todoView,
-    deleteNoteCommand
+    renameNoteCommand,
+    deleteNoteCommand,
+    selectNotesDirectoryCommand,
+    resetNotesDirectoryCommand
   );
 }
 

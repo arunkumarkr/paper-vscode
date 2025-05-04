@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import { INTERNAL_TODO_FILENAME } from "./constants";
 
 export class TodoPanelProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "todoPanel";
@@ -8,11 +9,25 @@ export class TodoPanelProvider implements vscode.WebviewViewProvider {
   private todoFilePath: string;
 
   constructor(private readonly context: vscode.ExtensionContext) {
-    const dir = path.join(context.globalStorageUri.fsPath);
+    // const dir = path.join(context.globalStorageUri.fsPath);
+
+    // Get the notes directory set by the user
+    const dir = context.workspaceState.get<string>("notesDirectory");
+
+    if (!dir) {
+      throw new Error(
+        "Notes directory is not set. Please select a notes folder first."
+      );
+    }
+
+    // Ensure the directory exists (safe fallback)
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    this.todoFilePath = path.join(dir, "todos.json");
+    // Set the path for the todos.json file inside the notes folder
+    this.todoFilePath = path.join(dir, INTERNAL_TODO_FILENAME);
+
+    // Create the file if it doesn't exist
     if (!fs.existsSync(this.todoFilePath)) {
       fs.writeFileSync(this.todoFilePath, "[]", "utf8");
     }
@@ -42,8 +57,20 @@ export class TodoPanelProvider implements vscode.WebviewViewProvider {
   }
 
   private readTodos(): { text: string; done: boolean }[] {
-    const raw = fs.readFileSync(this.todoFilePath, "utf8");
-    return JSON.parse(raw);
+    try {
+      if (!fs.existsSync(this.todoFilePath)) {
+        return [];
+      }
+      const raw = fs.readFileSync(this.todoFilePath, "utf8");
+      return JSON.parse(raw);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Unknown error while reading todos.";
+      vscode.window.showErrorMessage("Failed to read todos.json: " + message);
+      return [];
+    }
   }
 
   private saveTodos(todos: { text: string; done: boolean }[]) {
